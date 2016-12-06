@@ -6,6 +6,8 @@ import logging
 import logging.handlers
 pymysql.install_as_MySQLdb()
 
+
+# Logger
 logger = logging.getLogger('wsato_qiligeer_dcm_for_agent')
 logger.setLevel(logging.WARNING)
 handler = logging.handlers.TimedRotatingFileHandler(
@@ -15,6 +17,8 @@ handler = logging.handlers.TimedRotatingFileHandler(
 handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
 logger.addHandler(handler)
 
+
+# Rabbit MQ Connections
 credentials = pika.PlainCredentials('server1_dcm', '8nfdsS12gaf')
 
 server2_vhost_connection = pika.BlockingConnection(pika.ConnectionParameters(
