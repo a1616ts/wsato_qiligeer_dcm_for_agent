@@ -36,10 +36,11 @@ server4_vhost_channel.queue_declare(queue = 'from_agent_to_middleware', durable 
 def from_agent_to_middleware_callback(ch, method, properties, body):
     decoded_json = json.loads(body.decode('utf-8'))
     db = dataset.connect('mysql://dcm_user:dcmUser@1115@localhost/wsato_qiligeer')
+    name = decoded_json['name']
     table = db['domains']
-    result = table.find_one(name = decoded_json['name'])
+    result = table.find_one(name = name)
 
-    dic = dict(id = result['id'], name = decoded_json['name'])
+    dic = dict(id = result['id'], name = name)
     if 'status' in decoded_json:
         dic['status'] = decoded_json['status']
     if 'sshkey_path' in decoded_json:
