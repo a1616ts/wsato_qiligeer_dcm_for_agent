@@ -7,7 +7,7 @@ import logging.handlers
 pymysql.install_as_MySQLdb()
 
 
-# Logger
+# Logging
 logger = logging.getLogger('wsato_qiligeer_dcm_for_agent')
 logger.setLevel(logging.WARNING)
 handler = logging.handlers.TimedRotatingFileHandler(
