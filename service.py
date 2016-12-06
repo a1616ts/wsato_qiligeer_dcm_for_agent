@@ -2,7 +2,18 @@ import pika
 import json
 import dataset
 import pymysql
+import logging
+import logging.handlers
 pymysql.install_as_MySQLdb()
+
+logger = logging.getLogger('wsato_qiligeer_dcm_for_agent')
+logger.setLevel(logging.WARNING)
+handler = logging.handlers.TimedRotatingFileHandler(
+    filename = '/var/log/wsato_qiligeer/wsato_qiligeer_dcm_for_agent.log',
+    when = 'D'
+    )
+handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+logger.addHandler(handler)
 
 credentials = pika.PlainCredentials('server1_dcm', '8nfdsS12gaf')
 
@@ -39,6 +50,7 @@ def from_agent_to_middleware_callback(ch, method, properties, body):
         dic['error'] = decoded_json['error']
 
     if len(dic) < 3:
+        logger.eror('Arguments from agent are insufficient.')
         return
 
     db.begin()
@@ -46,6 +58,7 @@ def from_agent_to_middleware_callback(ch, method, properties, body):
         table.update(dic, ['id', 'name'])
         db.commit()
     except:
+        logger.eror('Update failed due to data error.')
         db.rollback()
 
 server2_vhost_channel.basic_consume(from_agent_to_middleware_callback,
