@@ -11,8 +11,8 @@ pymysql.install_as_MySQLdb()
 logger = logging.getLogger('wsato_qiligeer_dcm_for_agent')
 logger.setLevel(logging.WARNING)
 handler = logging.handlers.TimedRotatingFileHandler(
-    filename = '/var/log/wsato_qiligeer/wsato_qiligeer_dcm_for_agent.log',
-    when = 'D'
+    filename='/var/log/wsato_qiligeer/wsato_qiligeer_dcm_for_agent.log',
+    when='D'
     )
 handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
 logger.addHandler(handler)
@@ -22,19 +22,19 @@ logger.addHandler(handler)
 credentials = pika.PlainCredentials('server1_dcm', '8nfdsS12gaf')
 
 server2_vhost_connection = pika.BlockingConnection(pika.ConnectionParameters(
-    virtual_host = '/server2', credentials = credentials))
+    virtual_host='/server2', credentials=credentials))
 server2_vhost_channel = server2_vhost_connection.channel()
-server2_vhost_channel.queue_declare(queue = 'from_agent_to_middleware', durable = True)
+server2_vhost_channel.queue_declare(queue='from_agent_to_middleware', durable=True)
 
 server3_vhost_connection = pika.BlockingConnection(pika.ConnectionParameters(
-    virtual_host = '/server3', credentials = credentials))
+    virtual_host='/server3', credentials=credentials))
 server3_vhost_channel = server3_vhost_connection.channel()
-server3_vhost_channel.queue_declare(queue = 'from_agent_to_middleware', durable = True)
+server3_vhost_channel.queue_declare(queue='from_agent_to_middleware', durable=True)
 
 server4_vhost_connection = pika.BlockingConnection(pika.ConnectionParameters(
-    virtual_host = '/server4', credentials = credentials))
+    virtual_host='/server4', credentials=credentials))
 server4_vhost_channel = server4_vhost_connection.channel()
-server4_vhost_channel.queue_declare(queue = 'from_agent_to_middleware', durable = True)
+server4_vhost_channel.queue_declare(queue='from_agent_to_middleware', durable=True)
 
 
 def from_agent_to_middleware_callback(ch, method, properties, body):
@@ -42,9 +42,9 @@ def from_agent_to_middleware_callback(ch, method, properties, body):
     db = dataset.connect('mysql://dcm_user:dcmUser@1115@localhost/wsato_qiligeer')
     name = decoded_json['name']
     table = db['domains']
-    result = table.find_one(name = name)
+    result = table.find_one(name=name)
 
-    dic = dict(id = result['id'], name = name)
+    dic = dict(id=result['id'], name=name)
     if 'status' in decoded_json:
         dic['status'] = decoded_json['status']
     if 'sshkey_path' in decoded_json:
@@ -67,16 +67,16 @@ def from_agent_to_middleware_callback(ch, method, properties, body):
         db.rollback()
 
 server2_vhost_channel.basic_consume(from_agent_to_middleware_callback,
-                      queue = 'from_agent_to_middleware',
-                      no_ack = True)
+    queue='from_agent_to_middleware',
+    no_ack=True)
 server2_vhost_channel.start_consuming()
 
 server3_vhost_channel.basic_consume(from_agent_to_middleware_callback,
-                      queue = 'from_agent_to_middleware',
-                      no_ack = True)
+    queue='from_agent_to_middleware',
+    no_ack=True)
 server3_vhost_channel.start_consuming()
 
 server4_vhost_channel.basic_consume(from_agent_to_middleware_callback,
-                      queue = 'from_agent_to_middleware',
-                      no_ack = True)
+    queue='from_agent_to_middleware',
+    no_ack=True)
 server4_vhost_channel.start_consuming()
